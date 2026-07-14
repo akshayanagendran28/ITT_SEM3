@@ -1,0 +1,69 @@
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+
+void backtrack(int* nums, int numsSize, int* returnSize, int** returnColumnSizes, 
+               int*** res, int* maxResultSize, int* perm, bool* used, int depth) {
+    
+    if (depth == numsSize) {
+        
+        if (*returnSize >= *maxResultSize) {
+            *maxResultSize *= 2;
+            *res = (int**)realloc(*res, sizeof(int*) * (*maxResultSize));
+            *returnColumnSizes = (int*)realloc(*returnColumnSizes, sizeof(int) * (*maxResultSize));
+        }
+        
+        
+        (*res)[*returnSize] = (int*)malloc(sizeof(int) * numsSize);
+        for (int i = 0; i < numsSize; i++) {
+            (*res)[*returnSize][i] = perm[i];
+        }
+        (*returnColumnSizes)[*returnSize] = numsSize;
+        (*returnSize)++;
+        return;
+    }
+
+    for (int i = 0; i < numsSize; i++) {
+        if (used[i]) continue;
+
+      
+        if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) continue;
+
+        
+        used[i] = true;
+        perm[depth] = nums[i];
+
+      
+        backtrack(nums, numsSize, returnSize, returnColumnSizes, res, maxResultSize, perm, used, depth + 1);
+
+        
+        used[i] = false;
+    }
+}
+
+
+int** permuteUnique(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {
+    *returnSize = 0;
+    
+    
+    qsort(nums, numsSize, sizeof(int), compare);
+
+    
+    int maxResultSize = 100;
+    int** res = (int**)malloc(sizeof(int*) * maxResultSize);
+    *returnColumnSizes = (int*)malloc(sizeof(int) * maxResultSize);
+
+    
+    int* perm = (int*)malloc(sizeof(int) * numsSize);
+    bool* used = (bool*)calloc(numsSize, sizeof(bool)); 
+
+    
+    backtrack(nums, numsSize, returnSize, returnColumnSizes, &res, &maxResultSize, perm, used, 0);
+
+   
+    free(perm);
+    free(used);
+
+    return res;
+}
