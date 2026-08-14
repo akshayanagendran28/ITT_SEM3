@@ -1,0 +1,48 @@
+
+int compare(const void *a, const void *b) {
+    char ab[40];
+    char ba[40];
+    
+    strcpy(ab, *(const char **)a);
+    strcat(ab, *(const char **)b);
+    
+    strcpy(ba, *(const char **)b);
+    strcat(ba, *(const char **)a);
+    
+    return strcmp(ba, ab);
+}
+
+char* largestNumber(int* nums, int numsSize) {
+    
+    char **str_nums = (char **)malloc(numsSize * sizeof(char *));
+    int total_len = 0;
+    
+    for (int i = 0; i < numsSize; i++) {
+        str_nums[i] = (char *)malloc(20 * sizeof(char));
+        sprintf(str_nums[i], "%d", nums[i]);
+        total_len += strlen(str_nums[i]);
+    }
+    
+    qsort(str_nums, numsSize, sizeof(char *), compare);
+    
+    if (strcmp(str_nums[0], "0") == 0) {
+        char *result = (char *)malloc(2 * sizeof(char));
+        strcpy(result, "0");
+        
+        for (int i = 0; i < numsSize; i++) free(str_nums[i]);
+        free(str_nums);
+        
+        return result;
+    }
+    
+    char *result = (char *)malloc((total_len + 1) * sizeof(char));
+    result[0] = '\0';
+    
+    for (int i = 0; i < numsSize; i++) {
+        strcat(result, str_nums[i]);
+        free(str_nums[i]);
+    }
+    free(str_nums);
+    
+    return result;
+}
