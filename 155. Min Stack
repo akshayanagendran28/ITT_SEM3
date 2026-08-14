@@ -1,0 +1,50 @@
+class MinStack {
+    // Helper Node class to store the value and the current minimum
+    private class Node {
+        int val;
+        int min;
+        Node next;
+
+        private Node(int val, int min, Node next) {
+            this.val = val;
+            this.min = min;
+            this.next = next;
+        }
+    }
+
+    // The head of our linked list represents the top of the stack
+    private Node head;
+
+    /** Initializes the stack object. */
+    public MinStack() {
+        head = null;
+    }
+    
+    /** Pushes the element val onto the stack. */
+    public void push(int val) {
+        if (head == null) {
+            // If the stack is empty, the current value is the minimum
+            head = new Node(val, val, null);
+        } else {
+            // The new minimum is the lower value between current val and previous min
+            int currentMin = Math.min(val, head.min);
+            head = new Node(val, currentMin, head);
+        }
+    }
+    
+    /** Removes the element on the top of the stack. */
+    public void pop() {
+        // Since operations are guaranteed on non-empty stacks, move the head pointer forward
+        head = head.next;
+    }
+    
+    /** Gets the top element of the stack. */
+    public int top() {
+        return head.val;
+    }
+    
+    /** Retrieves the minimum element in the stack. */
+    public int getMin() {
+        return head.min;
+    }
+}
