@@ -1,0 +1,46 @@
+class Solution(object):
+    def maxTurbulenceSize(self, arr):
+        """
+        :type arr: List[int]
+        :rtype: int
+        """
+        if len(arr) < 2:
+            return len(arr)
+            
+        max_len = 1
+        current_streak = 1
+        
+        # Helper to convert comparisons to a representative numeric sign
+        # -1 if a < b, 1 if a > b, 0 if a == b
+        def get_sign(a, b):
+            if a < b: return -1
+            if a > b: return 1
+            return 0
+            
+        # FIXED: Correctly index the first two elements of the array
+        prev_sign = get_sign(arr[0], arr[1])
+        if prev_sign != 0:
+            max_len = 2
+            current_streak = 2
+            
+        # Slide forward across the rest of the array adjacent pairs
+        for i in range(1, len(arr) - 1):
+            curr_sign = get_sign(arr[i], arr[i + 1])
+            
+            # If the sign flips successfully, turbulence continues
+            if curr_sign != 0 and curr_sign == -prev_sign:
+                current_streak += 1
+            # If numbers are equal, the streak breaks completely
+            elif curr_sign == 0:
+                current_streak = 1
+            # If the sign duplicates instead of flipping, reset to the current valid pair (size 2)
+            else:
+                current_streak = 2
+                
+            # Keep track of the maximum length seen
+            if current_streak > max_len:
+                max_len = current_streak
+                
+            prev_sign = curr_sign
+            
+        return max_len
