@@ -1,0 +1,24 @@
+class Solution(object):
+    def numberOfArithmeticSlices(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) < 3:
+            return 0
+            
+        total_slices = 0
+        current_streak = 0
+        
+        # Start scanning from the 3rd element (index 2)
+        for i in range(2, len(nums)):
+            # Check if the difference between current pairs is uniform
+            if nums[i] - nums[i - 1] == nums[i - 1] - nums[i - 2]:
+                # Increment the count of consecutive arithmetic windows ending at index i
+                current_streak += 1
+                total_slices += current_streak
+            else:
+                # The arithmetic sequence is broken; reset the streak tracker
+                current_streak = 0
+                
+        return total_slices
