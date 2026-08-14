@@ -1,0 +1,27 @@
+class Solution(object):
+    def findClosestElements(self, arr, k, x):
+        """
+        :type arr: List[int]
+        :type k: int
+        :type x: int
+        :rtype: List[int]
+        """
+        # The starting index of our window of size k must fall in this range
+        left = 0
+        right = len(arr) - k
+        
+        # Binary search to find the optimal left boundary for the window
+        while left < right:
+            mid = (left + right) // 2
+            
+            # Compare the distance of 'x' to the element just outside the 
+            # left boundary (arr[mid]) versus just outside the right boundary (arr[mid + k])
+            if x - arr[mid] > arr[mid + k] - x:
+                # arr[mid] is further away from x than arr[mid + k], shift window right
+                left = mid + 1
+            else:
+                # arr[mid] is closer or equidistant (with smaller value), keep window left
+                right = mid
+                
+        # Return the k elements starting from the optimal left index found
+        return arr[left:left + k]
