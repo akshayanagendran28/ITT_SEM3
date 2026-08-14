@@ -1,0 +1,47 @@
+import java.util.Deque;
+import java.util.LinkedList;
+
+public class Solution {
+    public String simplifyPath(String path) {
+        // Split the path by one or more slashes
+        String[] components = path.split("/");
+        Deque<String> stack = new LinkedList<>();
+
+        for (String component : components) {
+            // Skip empty components (from "//") or current directory "."
+            if (component.isEmpty() || component.equals(".")) {
+                continue;
+            }
+            
+            if (component.equals("..")) {
+                // Go to parent directory by popping from stack if it's not empty
+                if (!stack.isEmpty()) {
+                    stack.removeLast();
+                }
+            } else {
+                // Valid directory or file name (e.g., "foo", "...")
+                stack.addLast(component);
+            }
+        }
+
+        // Build the canonical path from the remaining components
+        StringBuilder canonicalPath = new StringBuilder();
+        for (String dir : stack) {
+            canonicalPath.append("/").append(dir);
+        }
+
+        // If the stack was empty, return root "/"
+        return canonicalPath.length() == 0 ? "/" : canonicalPath.toString();
+    }
+
+    public static void main(String[] academind) {
+        Solution solver = new Solution();
+        
+        // Test examples
+        System.out.println(solver.simplifyPath("/home/"));                          // Output: "/home"
+        System.out.println(solver.simplifyPath("/home//foo/"));                     // Output: "/home/foo"
+        System.out.println(solver.simplifyPath("/home/user/Documents/../Pictures")); // Output: "/home/user/Pictures"
+        System.out.println(solver.simplifyPath("/../"));                            // Output: "/"
+        System.out.println(solver.simplifyPath("/.../a/../b/c/../d/./"));           // Output: "/.../b/d"
+    }
+}
