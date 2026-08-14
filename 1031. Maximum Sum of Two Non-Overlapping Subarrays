@@ -1,0 +1,37 @@
+class Solution(object):
+    def maxSumTwoNoOverlap(self, nums, firstLen, secondLen):
+        """
+        :type nums: List[int]
+        :type firstLen: int
+        :type secondLen: int
+        :rtype: int
+        """
+        n = len(nums)
+        # 1. Compute prefix sums in-place or dynamically to fetch window values easily
+        # For simplicity and O(1) space, we can build a lightweight prefix sum list
+        prefix_sums = [0] * (n + 1)
+        for i in range(n):
+            prefix_sums[i + 1] = prefix_sums[i] + nums[i]
+            
+        def getMaxSum(L1, L2):
+            max_L1 = 0
+            max_total = 0
+            # Slide the boundary point i where L1 ends and L2 begins
+            # i represents the index in prefix_sums where the first subarray concludes
+            for i in range(L1, n - L2 + 1):
+                # Sum of L1-length subarray ending at index i-1
+                current_L1_sum = prefix_sums[i] - prefix_sums[i - L1]
+                # Maintain the maximum sum seen for the first window so far
+                max_L1 = max(max_L1, current_L1_sum)
+                
+                # Sum of L2-length subarray starting right after index i
+                current_L2_sum = prefix_sums[i + L2] - prefix_sums[i]
+                
+                # Combine the best left window with the current right window
+                max_total = max(max_total, max_L1 + current_L2_sum)
+                
+            return max_total
+
+        # The array with length firstLen could occur BEFORE or AFTER secondLen
+        return max(getMaxSum(firstLen, secondLen), getMaxSum(secondLen, firstLen))
+     
