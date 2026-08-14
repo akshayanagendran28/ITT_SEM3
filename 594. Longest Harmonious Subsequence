@@ -1,0 +1,21 @@
+from collections import Counter
+
+class Solution(object):
+    def findLHS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        # Map each number to its total occurrence frequency
+        num_counts = Counter(nums)
+        max_length = 0
+        
+        # Iterate through the unique numbers in the array
+        for num in num_counts:
+            # A harmonious subsequence requires both x and x + 1 to exist
+            if num + 1 in num_counts:
+                # Total length is the sum of frequencies of num and num + 1
+                current_length = num_counts[num] + num_counts[num + 1]
+                max_length = max(max_length, current_length)
+                
+        return max_length
