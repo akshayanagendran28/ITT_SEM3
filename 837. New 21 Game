@@ -1,0 +1,41 @@
+class Solution(object):
+    def new21Game(self, n, k, maxPts):
+        """
+        :type n: int
+        :type k: int
+        :type maxPts: int
+        :rtype: float
+        """
+        # Edge case 1: If k == 0, Alice starts with 0 points and immediately stops.
+        # Since 0 <= n, she will always have n or fewer points (Probability = 1.0).
+        # Edge case 2: If k + maxPts <= n, even if Alice is at k - 1 and draws 
+        # the maximum possible points (maxPts), her score cannot exceed n.
+        if k == 0 or k + maxPts <= n:
+            return 1.0
+            
+        # dp[i] will store the probability of reaching exactly i points
+        dp = [0.0] * (n + 1)
+        dp[0] = 1.0  # Base case: probability of starting at 0 points is 1
+        
+        # Maintain a sliding window sum of probabilities of the last 'maxPts' states 
+        # from which Alice can make a draw to reach the current score.
+        window_sum = 1.0
+        
+        for i in range(1, n + 1):
+            # The probability of reaching 'i' points is the average of the 
+            # probabilities of the preceding valid states inside the sliding window.
+            dp[i] = window_sum / maxPts
+            
+            # If the current score is less than k, Alice can continue drawing from here.
+            # Thus, we add this state's probability to the window for future scores.
+            if i < k:
+                window_sum += dp[i]
+                
+            # If the window has slid past its maximum capacity (maxPts),
+            # we must evict the oldest state that is now out of reach.
+            if i - maxPts >= 0:
+                window_sum -= dp[i - maxPts]
+                
+        # The answer is the sum of probabilities of all valid stopping scores 
+        # that are between k and n inclusive.
+        return sum(dp[k:])
