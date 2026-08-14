@@ -1,0 +1,35 @@
+public class Solution {
+    public boolean isValidSerialization(String preorder) {
+
+        int slots = 1;
+        
+        
+        String[] nodes = preorder.split(",");
+        
+        for (String node : nodes) {
+      
+            slots--;
+ 
+            if (slots < 0) {
+                return false;
+            }
+            
+
+            if (!node.equals("#")) {
+                slots += 2;
+            }
+        }
+        
+
+        return slots == 0;
+    }
+
+  
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        
+        System.out.println(sol.isValidSerialization("9,3,4,#,#,1,#,#,2,#,6,#,#")); // 
+        System.out.println(sol.isValidSerialization("1,#"));                       // 
+        System.out.println(sol.isValidSerialization("9,#,#,1"));                   // 
+    }
+}
