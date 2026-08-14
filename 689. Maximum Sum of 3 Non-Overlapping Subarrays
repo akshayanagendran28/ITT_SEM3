@@ -1,0 +1,55 @@
+class Solution(object):
+    def maxSumOfThreeSubarrays(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        n = len(nums)
+        # 1. Compute the sum of all possible subarrays of length k
+        window_sums = []
+        current_sum = sum(nums[:k])
+        window_sums.append(current_sum)
+        
+        for i in range(k, n):
+            current_sum += nums[i] - nums[i - k]
+            window_sums.append(current_sum)
+            
+        m = len(window_sums)
+        
+        # 2. Build the 'left' array: stores the starting index of the maximum 
+        # subarray of length k in the range [0, i].
+        # Lexicographically smallest condition means we use '>' to update.
+        left = [0] * m
+        best_idx = 0
+        for i in range(m):
+            if window_sums[i] > window_sums[best_idx]:
+                best_idx = i
+            left[i] = best_idx
+            
+        # 3. Build the 'right' array: stores the starting index of the maximum
+        # subarray of length k in the range [i, m-1].
+        # Lexicographically smallest condition means we use '>=' to favor smaller indices when moving backward.
+        right = [0] * m
+        best_idx = m - 1
+        for i in range(m - 1, -1, -1):
+            if window_sums[i] >= window_sums[best_idx]:
+                best_idx = i
+            right[i] = best_idx
+            
+        # 4. Iterate through all possible positions for the middle subarray
+        # The middle window starting index 'mid' must leave space for a left and right window.
+        max_total_sum = 0
+        result = []
+        
+        for mid in range(k, m - k):
+            l_idx = left[mid - k]
+            r_idx = right[mid + k]
+            
+            total_sum = window_sums[l_idx] + window_sums[mid] + window_sums[r_idx]
+            
+            if total_sum > max_total_sum:
+                max_total_sum = total_sum
+                result = [l_idx, mid, r_idx]
+                
+        return result
