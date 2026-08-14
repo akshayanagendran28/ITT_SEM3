@@ -1,0 +1,36 @@
+from collections import deque
+
+class Solution(object):
+    def shortestSubarray(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        n = len(nums)
+        # FIXED: Added brackets around 0 to properly initialize the list
+        P = [0] * (n + 1)
+        for i in range(n):
+            P[i + 1] = P[i] + nums[i]
+            
+        min_length = float('inf')
+        # Monotonic deque to store indices of the prefix sum array P
+        deq = deque()
+        
+        # 2. Iterate through the prefix sum array
+        for i in range(n + 1):
+            # Maintain a valid target window condition: P[i] - P[deq[0]] >= k
+            # Shrink from the left if the sum requirement is met
+            while deq and P[i] - P[deq[0]] >= k:
+                min_length = min(min_length, i - deq.popleft())
+                
+            # Maintain the monotonic increasing property of the deque:
+            # If the current prefix sum is smaller than or equal to previous ones,
+            # those older indices can never produce a shorter valid subarray.
+            while deq and P[i] <= P[deq[-1]]:
+                deq.pop()
+                
+            # Insert the current index into the back of the queue
+            deq.append(i)
+            
+        return -1 if min_length == float('inf') else min_length
