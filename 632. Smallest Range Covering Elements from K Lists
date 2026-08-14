@@ -1,0 +1,41 @@
+import heapq
+
+class Solution(object):
+    def smallestRange(self, nums):
+        """
+        :type nums: List[List[int]]
+        :rtype: List[int]
+        """
+        # Min-heap will store tuples of: (value, list_index, element_index)
+        min_heap = []
+        current_max = float('-inf')
+        
+        # Step 1: Insert the first element of each of the k lists into the heap
+        for i in range(len(nums)):
+            val = nums[i][0]
+            heapq.heappush(min_heap, (val, i, 0))
+            current_max = max(current_max, val)
+            
+        # Initialize our tracking variables for the smallest range window
+        range_start, range_end = float('-inf'), float('inf')
+        
+        # Step 2: Extract elements from the heap and advance pointers
+        while min_heap:
+            current_min, list_idx, elem_idx = heapq.heappop(min_heap)
+            
+            # Update the smallest range if the current window [current_min, current_max] is narrower
+            if current_max - current_min < range_end - range_start:
+                range_start, range_end = current_min, current_max
+                
+            # If we've reached the end of any list, we cannot form a wider valid range
+            if elem_idx + 1 == len(nums[list_idx]):
+                break
+                
+            # Fetch the next element from the exact same list we just popped from
+            next_val = nums[list_idx][elem_idx + 1]
+            heapq.heappush(min_heap, (next_val, list_idx, elem_idx + 1))
+            
+            # Dynamically track the global maximum value currently present inside our window
+            current_max = max(current_max, next_val)
+            
+        return [range_start, range_end]
