@@ -1,0 +1,28 @@
+class Solution(object):
+    def totalFruit(self, fruits):
+        """
+        :type fruits: List[int]
+        :rtype: int
+        """
+        basket = {}
+        left = 0
+        
+        # Expand the window using the right pointer
+        for right in range(len(fruits)):
+            fruit_right = fruits[right]
+            basket[fruit_right] = basket.get(fruit_right, 0) + 1
+            
+            # Non-shrinking condition: If a third fruit type is found, 
+            # shift the left pointer by exactly one step to preserve the window size.
+            if len(basket) > 2:
+                fruit_left = fruits[left]
+                basket[fruit_left] -= 1
+                
+                # Permanently clear the key if its frequency reaches zero
+                if basket[fruit_left] == 0:
+                    del basket[fruit_left]
+                    
+                left += 1
+                
+        # The maximum window length ever reached is preserved at the end of the iteration
+        return right - left + 1
