@@ -1,0 +1,45 @@
+import java.util.Stack;
+
+public class Solution {
+    public String removeDuplicateLetters(String s) {
+        // Array to store the last occurrence index of each character
+        int[] lastIndex = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            lastIndex[s.charAt(i) - 'a'] = i;
+        }
+
+        // Array to track if a character is currently in the stack
+        boolean[] inStack = new boolean[26];
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            // If the character is already in our result stack, skip it
+            if (inStack[c - 'a']) {
+                continue;
+            }
+
+            // Maintain the monotonic increasing order:
+            // If the top of the stack is lexicographically larger than 'c',
+            // AND the top character appears again later in the string (lastIndex > i),
+            // we can safely pop it and add it back later.
+            while (!stack.isEmpty() && stack.peek() > c && lastIndex[stack.peek() - 'a'] > i) {
+                char removed = stack.pop();
+                inStack[removed - 'a'] = false;
+            }
+
+            // Push the current character and mark it as present in the stack
+            stack.push(c);
+            inStack[c - 'a'] = true;
+        }
+
+        // Build the final string from the stack
+        StringBuilder sb = new StringBuilder();
+        for (char ch : stack) {
+            sb.append(ch);
+        }
+
+        return sb.toString();
+    }
+}
