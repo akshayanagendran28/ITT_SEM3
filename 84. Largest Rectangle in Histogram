@@ -1,0 +1,51 @@
+import java.util.Stack;
+
+public class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if (heights == null || heights.length == 0) {
+            return 0;
+        }
+
+        Stack<Integer> stack = new Stack<>();
+        int maxArea = 0;
+        int n = heights.length;
+
+        // Iterate through all bars, including an extra virtual bar of height 0 at index 'n'
+        // to empty the stack at the end.
+        for (int i = 0; i <= n; i++) {
+            // Use 0 as the height for the virtual ending element
+            int currentHeight = (i == n) ? 0 : heights[i];
+
+            // Maintain a strictly increasing stack of indices.
+            // If the current bar is shorter than the bar at the top of the stack,
+            // we can calculate the area for the rectangle bounded by the top bar.
+            while (!stack.isEmpty() && currentHeight < heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                
+                // If stack is empty, it means the popped bar was the shortest seen so far,
+                // so its width spans from index 0 up to i.
+                // Otherwise, the width is bounded by the current index and the new top of the stack.
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                
+                maxArea = Math.max(maxArea, height * width);
+            }
+            
+            // Push the current bar's index onto the stack
+            stack.push(i);
+        }
+
+        return maxArea;
+    }
+
+    public static void main(String[] args) {
+        Solution solver = new Solution();
+        
+        // Example 1
+        int[] heights1 = {2, 1, 5, 6, 2, 3};
+        System.out.println("Max Area: " + solver.largestRectangleArea(heights1)); // Output: 10
+
+        // Example 2
+        int[] heights2 = {2, 4};
+        System.out.println("Max Area: " + solver.largestRectangleArea(heights2)); // Output: 4
+    }
+}
