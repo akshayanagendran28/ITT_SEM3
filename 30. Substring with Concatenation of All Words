@@ -1,0 +1,96 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Simple hash map node structure for C
+typedef struct {
+    char* word;
+    int count;
+} WordMap;
+
+// Helper function to find a word index in our map
+int findWordIndex(WordMap* map, int mapSize, const char* str, int len) {
+    for (int i = 0; i < mapSize; i++) {
+        if (strncmp(map[i].word, str, len) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int* findSubstring(char* s, char** words, int wordsSize, int* returnSize) {
+    *returnSize = 0;
+    if (!s || wordsSize == 0) return NULL;
+
+    int s_len = strlen(s);
+    int word_len = strlen(words[0]);
+    int total_words_len = word_len * wordsSize;
+    if (s_len < total_words_len) return NULL;
+
+    // Allocate maximum possible array space for output indices
+    int* result = (int*)malloc(sizeof(int) * (s_len - total_words_len + 1));
+    
+    // Build a unique word count list (simulating a Hash Map)
+    WordMap* targetMap = (WordMap*)malloc(sizeof(WordMap) * wordsSize);
+    int uniqueWordsCount = 0;
+
+    for (int i = 0; i < wordsSize; i++) {
+        int idx = findWordIndex(targetMap, uniqueWordsCount, words[i], word_len);
+        if (idx != -1) {
+            targetMap[idx].count++;
+        } else {
+            targetMap[uniqueWordsCount].word = words[i];
+            targetMap[uniqueWordsCount].count = 1;
+            uniqueWordsCount++;
+        }
+    }
+
+    // Allocate active window counters
+    int* currCounts = (int*)calloc(uniqueWordsCount, sizeof(int));
+
+    // Sliding window with alignment offsets
+    for (int i = 0; i < word_len; i++) {
+        int left = i;
+        int right = i;
+        int words_used = 0;
+        memset(currCounts, 0, sizeof(int) * uniqueWordsCount);
+
+        while (right + word_len <= s_len) {
+            // Get pointer to current slice
+            char* word_ptr = s + right;
+            right += word_len;
+
+            int idx = findWordIndex(targetMap, uniqueWordsCount, word_ptr, word_len);
+            if (idx != -1) {
+                currCounts[idx]++;
+                words_used++;
+
+                // Shrink window if frequency exceeded
+                while (currCounts[idx] > targetMap[idx].count) {
+                    char* left_word_ptr = s + left;
+                    int left_idx = findWordIndex(targetMap, uniqueWordsCount, left_word_ptr, word_len);
+                    currCounts[left_idx]--;
+                    words_used--;
+                    left += word_len;
+                }
+
+                // Match confirmed
+                if (words_used == wordsSize) {
+                    result[*returnSize] = left;
+                    (*returnSize)++;
+                }
+            } else {
+                // Invalid word encountered, flush counts
+                memset(currCounts, 0, sizeof(int) * uniqueWordsCount);
+                words_used = 0;
+                left = right;
+            }
+        }
+    }
+
+    // Free temporary memory structures
+    free(targetMap);
+    free(currCounts);
+
+    return result;
+}
