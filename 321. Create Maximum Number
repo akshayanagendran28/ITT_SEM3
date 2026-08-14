@@ -1,0 +1,75 @@
+public class Solution {
+    public int[] maxNumber(int[] nums1, int[] nums2, int k) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int[] maxResult = new int[k];
+
+        // i represents the number of elements chosen from nums1
+        // We must ensure that we don't choose more elements than available in nums1 (i <= m)
+        // and we leave enough room so that we don't exceed nums2's capacity (k - i <= n -> i >= k - n)
+        int start = Math.max(0, k - n);
+        int end = Math.min(k, m);
+
+        for (int i = start; i <= end; i++) {
+            int[] sub1 = maxSubarray(nums1, i);
+            int[] sub2 = maxSubarray(nums2, k - i);
+            int[] merged = merge(sub1, sub2, k);
+            
+            // Track the largest lexicographical combination
+            if (greater(merged, 0, maxResult, 0)) {
+                maxResult = merged;
+            }
+        }
+
+        return maxResult;
+    }
+
+    // Step 1: Find the maximum subsequence of a given length using a monotonic stack
+    private int[] maxSubarray(int[] nums, int len) {
+        int[] result = new int[len];
+        int top = 0;
+        int n = nums.length;
+
+        for (int i = 0; i < n; i++) {
+            // We can pop from our stack if:
+            // 1. The stack is not empty
+            // 2. The current number is larger than the top of the stack
+            // 3. We still have enough remaining elements left in 'nums' to fill the required 'len'
+            while (top > 0 && result[top - 1] < nums[i] && (top + n - i) > len) {
+                top--;
+            }
+            if (top < len) {
+                result[top++] = nums[i];
+            }
+        }
+        return result;
+    }
+
+    // Step 2: Merge two arrays to form the largest possible number
+    private int[] merge(int[] part1, int[] part2, int k) {
+        int[] merged = new int[k];
+        int p1 = 0, p2 = 0;
+
+        for (int i = 0; i < k; i++) {
+            // Always take from the array whose current suffix is lexicographically larger
+            if (greater(part1, p1, part2, p2)) {
+                merged[i] = part1[p1++];
+            } else {
+                merged[i] = part2[p2++];
+            }
+        }
+        return merged;
+    }
+
+    // Helper: Compares suffixes of two arrays starting from index i and j
+    private boolean greater(int[] nums1, int i, int[] nums2, int j) {
+        while (i < nums1.length && j < nums2.length) {
+            if (nums1[i] > nums2[j]) return true;
+            if (nums1[i] < nums2[j]) return false;
+            i++;
+            j++;
+        }
+        // If we reach the end of one array, the one with remaining elements is greater
+        return i < nums1.length;
+    }
+}
