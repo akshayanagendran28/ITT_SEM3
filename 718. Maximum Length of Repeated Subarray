@@ -1,0 +1,28 @@
+class Solution(object):
+    def findLength(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: int
+        """
+        m, n = len(nums1), len(nums2)
+        
+        # Optimize space by only storing the current row and the previous row
+        # Initialize the previous row with zeros
+        prev_dp = [0] * (n + 1)
+        max_length = 0
+        
+        # Iterate through every element of nums1
+        for i in range(1, m + 1):
+            current_dp = [0] * (n + 1)
+            # Iterate through every element of nums2
+            for j in range(1, n + 1):
+                # If numbers match, extend the repeated subarray length from the previous diagonal
+                if nums1[i - 1] == nums2[j - 1]:
+                    current_dp[j] = prev_dp[j - 1] + 1
+                    if current_dp[j] > max_length:
+                        max_length = current_dp[j]
+            # Move the current row configuration to the previous row for the next iteration
+            prev_dp = current_dp
+            
+        return max_length
