@@ -1,0 +1,32 @@
+class Solution(object):
+    def minKBitFlips(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        n = len(nums)
+        flips = 0
+        # Tracks the number of active flips affecting the current position
+        current_flips = 0 
+        
+        for i in range(n):
+            # If the window has slid past a flip that started k steps ago,
+            # that flip no longer affects the current position. Evict it.
+            if i >= k and nums[i - k] == 2:
+                current_flips -= 1
+                
+            # If the current bit (after applying current_flips parity) evaluates to 0,
+            # we are forced to initiate a new flip starting at index i.
+            if current_flips % 2 == nums[i]:
+                # If there isn't enough space left to execute a full flip of size k,
+                # it is physically impossible to clear all zeros. Return -1.
+                if i + k > n:
+                    return -1
+                    
+                # Mark the element at index i as '2' to signify a flip started here
+                nums[i] = 2
+                current_flips += 1
+                flips += 1
+                
+        return flips
