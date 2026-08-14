@@ -1,0 +1,60 @@
+class Solution(object):
+    def minWindow(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: str
+        """
+        if not s or not t or len(s) < len(t):
+            return ""
+
+        # Frequency array for characters in t (ASCII size 128 covers all English letters)
+        target_counts = [0] * 128
+        for char in t:
+            target_counts[ord(char)] += 1
+
+        # Track number of unique characters in t that are fully matched in current window
+        required_chars = sum(1 for count in target_counts if count > 0)
+        formed_chars = 0
+
+        # Frequency array to track current window characters
+        window_counts = [0] * 128
+
+        # Sliding window parameters
+        left = 0
+        min_len = float('inf')
+        start_idx = 0
+
+        # Expand the window using the right pointer
+        for right in range(len(s)):
+            char_right = s[right]
+            ascii_right = ord(char_right)
+            
+            window_counts[ascii_right] += 1
+
+            # If the current character match count satisfies target criteria
+            if target_counts[ascii_right] > 0 and window_counts[ascii_right] == target_counts[ascii_right]:
+                formed_chars += 1
+
+            # Try to contract the window from the left once all characters are present
+            while formed_chars == required_chars:
+                # Update minimum window configuration if a smaller one is found
+                current_window_len = right - left + 1
+                if current_window_len < min_len:
+                    min_len = current_window_len
+                    start_idx = left
+
+                # Remove the leftmost character from the window
+                char_left = s[left]
+                ascii_left = ord(char_left)
+                
+                window_counts[ascii_left] -= 1
+                
+                # If removing this character breaks the target matching criteria
+                if target_counts[ascii_left] > 0 and window_counts[ascii_left] < target_counts[ascii_left]:
+                    formed_chars -= 1
+
+                left += 1
+
+        # Return the minimum substring found, or empty string if no valid window exists
+        return "" if min_len == float('inf') else s[start_idx:start_idx + min_len]
