@@ -1,0 +1,38 @@
+import java.util.Stack;
+
+public class Solution {
+    public int evalRPN(String[] tokens) {
+        Stack<Integer> stack = new Stack<>();
+
+        for (String token : tokens) {
+            // Check if the current token is an operator
+            if (token.equals("+") || token.equals("-") || token.equals("*") || token.equals("/")) {
+                // The first popped element is the right operand (b)
+                // The second popped element is the left operand (a)
+                int b = stack.pop();
+                int a = stack.pop();
+
+                switch (token) {
+                    case "+":
+                        stack.push(a + b);
+                        break;
+                    case "-":
+                        stack.push(a - b);
+                        break;
+                    case "*":
+                        stack.push(a * b);
+                        break;
+                    case "/":
+                        stack.push(a / b); // Java integer division naturally truncates toward zero
+                        break;
+                }
+            } else {
+                // If it's a number, parse it and push it onto the stack
+                stack.push(Integer.parseInt(token));
+            }
+        }
+
+        // The final remaining element in the stack is the total evaluated result
+        return stack.pop();
+    }
+}
