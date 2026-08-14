@@ -1,0 +1,23 @@
+from collections import Counter
+
+class Solution(object):
+    def longestSubstring(self, s, k):
+        """
+        :type s: str
+        :type k: int
+        :rtype: int
+        """
+        if len(s) < k:
+            return 0
+            
+        # Count the frequency of each character in the current substring
+        counts = Counter(s)
+        
+        # Find the first character that fails the frequency threshold criteria
+        for char, count in counts.items():
+            if count < k:
+                # Divide and Conquer: split the string by this invalid character
+                return max(self.longestSubstring(sub, k) for sub in s.split(char))
+                
+        # If all characters meet the frequency requirement, return the total length
+        return len(s)
