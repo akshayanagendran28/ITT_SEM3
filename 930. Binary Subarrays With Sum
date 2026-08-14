@@ -1,0 +1,32 @@
+class Solution(object):
+    def numSubarraysWithSum(self, nums, goal):
+        """
+        :type nums: List[int]
+        :type goal: int
+        :rtype: int
+        """
+        # Helper function to count subarrays with a sum less than or equal to 'target'
+        def countAtMost(target):
+            if target < 0:
+                return 0
+                
+            left = 0
+            current_sum = 0
+            total_subarrays = 0
+            
+            # Expand the window using the right pointer
+            for right in range(len(nums)):
+                current_sum += nums[right]
+                
+                # Shrink the window from the left if the sum exceeds the target
+                while current_sum > target:
+                    current_sum -= nums[left]
+                    left += 1
+                    
+                # The number of valid subarrays ending at 'right' is equal to the window size
+                total_subarrays += (right - left + 1)
+                
+            return total_subarrays
+
+        # Exact matches = (at most goal) - (at most goal - 1)
+        return countAtMost(goal) - countAtMost(goal - 1)
