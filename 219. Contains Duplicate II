@@ -1,0 +1,23 @@
+class Solution(object):
+    def containsNearbyDuplicate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: bool
+        """
+        # A hash set acts as our window of size k
+        window = set()
+        
+        for i, num in enumerate(nums):
+            # If the window already contains the number, a valid pair is found
+            if num in window:
+                return True
+                
+            # Add current number to the window
+            window.add(num)
+            
+            # If window size exceeds k, evict the oldest element from the left
+            if len(window) > k:
+                window.remove(nums[i - k])
+                
+        return False
