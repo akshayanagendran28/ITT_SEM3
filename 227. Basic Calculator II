@@ -1,0 +1,51 @@
+public class Solution {
+    public int calculate(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+
+        int len = s.length();
+        // A primitive array stack is faster than java.util.Stack
+        int[] stack = new int[len];
+        int top = -1;
+        
+        int currentNumber = 0;
+        char operation = '+'; // Tracks the operation preceding the current number
+
+        for (int i = 0; i < len; i++) {
+            char currentChar = s.charAt(i);
+
+            // Form the multi-digit number
+            if (Character.isDigit(currentChar)) {
+                currentNumber = (currentNumber * 10) + (currentChar - '0');
+            }
+
+            // If the character is an operator or we reached the end of the string
+            if (!Character.isDigit(currentChar) && currentChar != ' ' || i == len - 1) {
+                if (operation == '+') {
+                    stack[++top] = currentNumber;
+                } else if (operation == '-') {
+                    stack[++top] = -currentNumber;
+                } else if (operation == '*') {
+                    // Evaluate immediately with the last pushed number
+                    stack[top] = stack[top] * currentNumber;
+                } else if (operation == '/') {
+                    // Evaluate immediately (Java integer division truncates toward zero)
+                    stack[top] = stack[top] / currentNumber;
+                }
+                
+                // Save the current operation and reset the number tracker
+                operation = currentChar;
+                currentNumber = 0;
+            }
+        }
+
+        // Sum up all deferred elements remaining in the array stack
+        int result = 0;
+        while (top >= 0) {
+            result += stack[top--];
+        }
+
+        return result;
+    }
+}
